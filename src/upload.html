@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
+    <title>cert on chain</title>
+
+    <!-- Bootstrap -->
+    <link href="css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+      <script src="https://oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js"></script>
+      <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+    <![endif]-->
+  </head>
+  <body>
+    <!-- <div class="container"> -->
+      <div class="row">
+        <div class="col-xs-12 col-sm-8 col-sm-push-2">
+          <h1 class="text-center">add cert</h1>
+          <hr/>
+          <br/>
+        </div>
+
+        <!-- new CA -->
+          <div class="form-horizontal">
+            <div class="form-group">
+              <div class="col-sm-8 col-sm-push-1 ">
+              caname:<textarea class="form-control" id="new_ca" ></textarea>
+              </div>
+              <button class="btn btn-primary col-sm-1 col-sm-push-1" id="add_ca">add ca</button>
+            </div>
+          </div>
+
+          <!-- new cert -->
+        <div class="form-horizontal">
+          <div class="form-group">
+            <div class="col-sm-8 col-sm-push-1 ">
+            userid:<textarea class="form-control" id="new_cert1" ></textarea>
+            name:<textarea class="form-control" id="new_cert2" ></textarea>
+            certid:<textarea class="form-control" id="new_cert3" ></textarea>
+            time:<textarea class="form-control" id="new_cert4" ></textarea>
+            ipfs:<textarea class="form-control" id="new_cert5" ></textarea>
+            </div>
+            <button class="btn btn-primary col-sm-1 col-sm-push-1" id="add_cert">add cert</button>
+          </div>
+        </div>
+
+    </div>
+
+
+    <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
+    <!-- <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script> -->
+    <script src="https://code.jquery.com/jquery-1.12.4.min.js"></script>
+    <!-- Include all compiled plugins (below), or include individual files as needed -->
+    <script src="js/bootstrap.min.js"></script>
+    <script src="js/web3.min.js"></script>
+    <script src="js/truffle-contract.js"></script>
+    <script src="js/app.js"></script>
+  </body>
+</html>
