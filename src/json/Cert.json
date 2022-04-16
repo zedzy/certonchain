@@ -1,7 +1,4 @@
 {
-  "certid":null,
-  "id":null,
-  "name":null,
-  "ca":null,
+  "cert":null,
   "time":null
 }
