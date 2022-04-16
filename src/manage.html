@@ -21,11 +21,19 @@
     <!-- <div class="container"> -->
       <div class="row">
         <div class="col-xs-12 col-sm-8 col-sm-push-2">
-          <h1 class="text-center">my cert</h1>
+          <h1 class="text-center">manage cert</h1>
           <hr/>
           <br/>
         </div>
 
+        <div class="form-horizontal">
+          <div class="form-group">
+            <div class="col-sm-8 col-sm-push-1 ">
+              owneraddress:<textarea class="form-control" id="address" ></textarea>
+            </div>
+            <button class="btn btn-primary col-sm-1 col-sm-push-1" id="search">search</button>
+          </div>
+        </div>
 
         <div id="certs" >
         </div>
@@ -42,6 +50,6 @@
     <script src="js/truffle-contract.js"></script>
     <script src="js/index.min.js"></script>
     <script src="js/index.js"></script>
-    <script src="js/userapp.js"></script>
+    <script src="js/manageapp.js"></script>
   </body>
 </html>
