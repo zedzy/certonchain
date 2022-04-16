@@ -3,6 +3,7 @@ App = {
   contracts: {},
   account: null,
   certIntance: null,
+  ipfs:null,
   arrayLength : 0,
 
 
@@ -12,17 +13,23 @@ App = {
 
   initWeb3: async function() {
 
+    // Modern dapp browsers...
     if (window.ethereum) {
       App.web3Provider = window.ethereum;
       try {
+        // Request account access
         await window.ethereum.enable();
       } catch (error) {
+        // User denied account access...
         console.error("User denied account access");
       }
     }
+
+    // Legacy dapp browsers...
     else if (window.web3) {
       App.web3Provider = window.web3.currentProvider;
     }
+    // If no injected web3 instance is detected, fall back to Ganache
     else {
       App.web3Provider = new Web3.providers.HttpProvider('http://localhost:7545');
       console.log("localhost7545");
@@ -45,7 +52,6 @@ App = {
   initAccount: function() {
     web3.eth.getAccounts(function(error, accounts) {
       App.account = accounts[0];
-
     });
   },
 
@@ -56,17 +62,28 @@ App = {
 
       App.contracts.certContract.deployed().then(function(instance) {
         App.certIntance = instance;
-        return App.bindEvents();
+        return App.initIPFS();
+
       });
 
     });
 
   },
 
+  initIPFS:function(){
+    // ipfs = window.IpfsHttpClient.create({host:'ipfs.infura.io',port: 5001,
+    // protocol:'https'});
+    ipfs = window.IpfsHttpClient.create({host:'localhost',port: 5001,
+    protocol:'http'});
+    console.log(ipfs);
+
+    return App.bindEvents();
+  },
+
   bindEvents: function() {
 
-    $("#new_uploader").on('click', function(){
-      console.log("click new");
+    $("#add_cert").on('click', function() {
+      console.log("click add cert");
       var flag=true;
       $('textarea').each(function(){
         var check = this.value;
@@ -77,74 +94,40 @@ App = {
         }
       });
       if(flag){
-        console.log(App.account);
-        App.certIntance.addUploader($("#new_uploader1").val(),$("#new_uploader2").val(),{from:App.account}).then(function(result) {
-           return App.watchChange();
-        }).catch(function (err) {
-          console.log(err.message);
+        App.certIntance.uploadermap(App.account).then(function(ca){
+          console.log(ca);
+          if(ca != 'undefined' && ca && /[^\s]/.test(ca)){
+            $.getJSON('./json/Cert.json',function(jsonObject){
+              jsonObject.cert = $("#new_cert2").val();
+              jsonObject.time = $("#new_cert3").val();
+              certInfo = JSON.stringify(jsonObject);
+              ipfs.add(certInfo).then((response)=>{
+                cid = response.cid.toString(); //获取cid，即⽂件标识
+                console.log(cid);
+                App.certIntance.addCert($("#new_cert1").val(),cid,{from:App.account}).then(function(result) {
+                   return App.watchChange();
+                }).catch(function (err) {
+                  console.log(err.message);
+                });
+              });
+            });
+          }else {
+            alert("uploader is not accessed");
+          }
+
         });
       }
     });
 
-    $("#all_uploader").on('click', function(){
-      console.log("click all");
-      $('#uploaders').remove();
-      $('.row').append('<div id="uploaders" ></div>');
-        App.certIntance.getUploadListLen().then(function(len) {
-          console.log("num of uploader:" + len);
-          App.arrayLength = len;
-          if (len > 0) {
-            App.loadUploader( len - 1);
-          }
-        }).catch(function(err) {
-          console.log(err.message);
-        });
-    });
-
-  },
-
-  adjustHeight: function() {
-    console.log("reset height");
-    $('textarea').each(function () {
-      console.log("reset height");
-           this.setAttribute('style', 'height:' + (this.scrollHeight) + 'px;overflow-y:hidden;');
-        }).on('input', function () {
-        this.style.height = 'auto';
-        this.style.height = (this.scrollHeight) + 'px';
-        })
-  },
-
-  loadUploader: function(index) {
-    App.certIntance.uploadlist(index).then(function(address) {
-      App.certIntance.uploadermap(address).then(function(name){
-        $("#uploaders").append(
-        '<div class="form-horizontal"> <div class="form-group"><div class="col-sm-8 col-sm-push-1 ">' +
-        ' <textarea class="form-control" id="uploader'+
-        + index
-        + '" >'
-        + address +name
-        + '</textarea></div>'
-        +  '</div> </div>');
-        if (index -1 >= 0) {
-          App.loadUploader(index - 1);
-        } else {
-          App.adjustHeight();
-        }
-      });
-    }).catch(function(err) {
-      console.log(err.message);
-    });
   },
 
   watchChange: function() {
-      var infoEvent = App.certIntance.NewUploader();
+      var infoEvent = App.certIntance.NewCert();
       return infoEvent.watch(function (err, result) {
         console.log("reload");
         window.location.reload();
       });
   },
-
-
 
   getAccountParam: function() {
     var reg = new RegExp("(^|&)account=([^&]*)(&|$)");

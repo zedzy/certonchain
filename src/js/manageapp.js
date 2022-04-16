@@ -5,7 +5,7 @@ App = {
   certIntance: null,
   ipfs:null,
   arrayLength : 0,
-
+  address: null,
 
   init: async function() {
     return await App.initWeb3();
@@ -71,12 +71,21 @@ App = {
 
     console.log(ipfs);
 
-    return App.getCerts();
+    return App.bindEvents();
   },
 
-  getCerts: function() {
+  bindEvents: function() {
 
-        App.certIntance.getCertsLen(App.account).then(function(len) {
+    $("#search").on('click', function(){
+      $('#certs').remove();
+      $('.row').append('<div id="certs" ></div>');
+      var check = $('#address').val();
+      if(check.match('/^[ ]*$/')){
+        alert("your input exit empty");
+        return false;
+      }else {
+        App.address = $('#address').val();
+        App.certIntance.getCertsLen(App.address).then(function(len) {
           console.log("num of cert:" + len);
           App.arrayLength = len;
           if (len > 0) {
@@ -86,7 +95,18 @@ App = {
         }).catch(function(err) {
           console.log(err.message);
         });
+      }
 
+    });
+
+  },
+
+  watchChange: function() {
+      var infoEvent = App.certIntance.CancelCert();
+      return infoEvent.watch(function (err, result) {
+        console.log("reload");
+        window.location.reload();
+      });
   },
 
   adjustHeight: function() {
@@ -97,15 +117,25 @@ App = {
         }).on('input', function () {
         this.style.height = 'auto';
         this.style.height = (this.scrollHeight) + 'px';
-        })
+      });
+
+      $("[name^=cancel]").on('click', function(){
+        console.log(this.value);
+        App.certIntance.cancel(App.address,this.value,{from:App.account}).then(function(result){
+          return App.watchChange();
+        }).catch(function (err) {
+          console.log(err.message);
+        });
+      });
+
   },
 
   loadCert: function(index) {
 
-    App.certIntance.certmap(App.account, index).then(function(cert) {
+    App.certIntance.certmap(App.address, index).then(function(cert) {
       cid = cert[2];
       console.log(cid);
-      if(cert[1]==true){
+
         toBuffer(ipfs.cat(cid)).then((bufferedContents)=>{
           certcontent = App.Uint8ArrayToString(bufferedContents);
           certcontent = $.parseJSON(certcontent);
@@ -114,19 +144,19 @@ App = {
           ' <textarea class="form-control" id="cert'+
           + index
           + '" >'
-          + certcontent.cert + '\n' +certcontent.time
+          + certcontent.cert + '\n' +certcontent.time + '\n' +cert[1]
           + '</textarea></div>'
+          + '<button class="btn btn-primary col-sm-1 col-sm-push-1" name="cancel'+index+'" value='+index+'>cancel</button>'
           +  '</div> </div>');
-
+          if (index -1 >= 0) {
+            App.loadCert(index - 1);
+          } else {
+            App.adjustHeight();
+          }
         }).catch(function(err){
           console.log(err.message);
         });
-      }
-      if (index -1 >= 0) {
-        App.loadCert(index - 1);
-      } else {
-        App.adjustHeight();
-      }
+
     } ).catch(function(err) {
       console.log(err.message);
     });
