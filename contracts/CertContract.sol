@@ -26,16 +26,16 @@ contract CertContract {
     event NewCert(address uploader,string ipfsaddress);
 
     function addCert(address owner,string memory ipfsaddress) public {
-        /* require(uploadermap[msg.sender]==true); */
-        bool check =false;
+        require(bytes(uploadermap[msg.sender]).length!=0);
+        /* bool check =false;
         for (uint i =0; i<uploadlist.length;i++){
           if(uploadlist[i]==msg.sender){
             check=true;
             break;
           }
         }
-        require(check==true);
-        cert memory c = cert(owner,true,ipfsaddress);
+        require(check==true); */
+        cert memory c = cert(msg.sender,true,ipfsaddress);
         certmap[owner].push(c);
         emit NewCert(msg.sender,ipfsaddress);
     }
@@ -48,15 +48,15 @@ contract CertContract {
 
     function addUploader(address uploader,string memory name) public {
         require(msg.sender==deployer);
-        /* require(uploadermap[uploader]==false); */
-        bool check =false;
+        require(bytes(uploadermap[uploader]).length==0);
+        /* bool check =false;
         for (uint i =0; i<uploadlist.length;i++){
           if(uploadlist[i]==uploader){
             check=true;
             break;
           }
         }
-        require(check==false);
+        require(check==false); */
         uploadermap[uploader]=name;
         uploadlist.push(uploader);
         emit NewUploader(uploader, name);
