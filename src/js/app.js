@@ -71,8 +71,10 @@ App = {
   },
 
   initIPFS:function(){
-    ipfs = window.IpfsHttpClient.create({host:'ipfs.infura.io',port: 5001,
-    protocol:'https'});
+    // ipfs = window.IpfsHttpClient.create({host:'ipfs.infura.io',port: 5001,
+    // protocol:'https'});
+    ipfs = window.IpfsHttpClient.create({host:'localhost',port: 5001,
+    protocol:'http'});
     console.log(ipfs);
 
     return App.bindEvents();
@@ -92,19 +94,16 @@ App = {
         }
       });
       if(flag){
-        App.certIntance.camap(App.account).then(function(ca){
+        App.certIntance.uploadermap(App.account).then(function(ca){
           $.getJSON('./json/Cert.json',function(jsonObject){
-            jsonObject.certid = $("#new_cert1").val();
-            jsonObject.id = $("#new_cert2").val();
-            jsonObject.name = $("#new_cert3").val();
-            jsonObject.time = $("#new_cert4").val();
-            jsonObject.ca = ca[0];
+            jsonObject.cert = $("#new_cert2").val();
+            jsonObject.time = $("#new_cert3").val();
             certInfo = JSON.stringify(jsonObject);
             ipfs.add(certInfo).then((response)=>{
               cid = response.cid.toString(); //获取cid，即⽂件标识
               console.log(cid);
-              App.certIntance.addCert($("#new_cert2").val(),$("#new_cert3").val(),cid,{from:App.account}).then(function(result) {
-                 return App.watchChange("cert");
+              App.certIntance.addCert($("#new_cert1").val(),cid,{from:App.account}).then(function(result) {
+                 return App.watchChange();
               }).catch(function (err) {
                 console.log(err.message);
               });
@@ -112,46 +111,12 @@ App = {
           });
         });
       }
-
     });
 
-    $("#add_ca").on('click', function() {
-      console.log("click add ca");
-      var check = $("#new_ca").val();
-      if(check.match('/^[ ]*$/'))alert("your input exit empty");
-      else{
-        App.certIntance.addCA($("#new_ca").val(),{from:App.account}).then(function(result) {
-           return App.watchChange("ca");
-        }).catch(function (err) {
-          console.log(err.message);
-        });
-      }
-
-    });
-
-
-    // $("#notes").on('click', "button", function() {
-    //   var cindex = $(this).attr("index");
-    //   var noteid = "#note" + cindex
-    //   var note = $(noteid).val();
-    //   console.log(noteid);
-    //   console.log(note);
-    //
-    //
-    //   App.noteIntance.modifyNote(cindex, note,{from:App.account}).then(
-    //       function(result) {
-    //         return App.getNotes();
-    //       }
-    //     ).catch(function (err) {
-    //       console.log(err.message);
-    //     });
-    // });
   },
 
-  watchChange: function(name) {
-      var infoEvent;
-      if(name=="cert")infoEvent = App.certIntance.NewCert();
-      else if(name=="ca")infoEvent = App.certIntance.NewCA();
+  watchChange: function() {
+      var infoEvent = App.certIntance.NewCert();
       return infoEvent.watch(function (err, result) {
         console.log("reload");
         window.location.reload();

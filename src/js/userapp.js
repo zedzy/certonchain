@@ -13,21 +13,21 @@ App = {
 
   initWeb3: async function() {
 
-    // if (window.ethereum) {
-    //   App.web3Provider = window.ethereum;
-    //   try {
-    //     await window.ethereum.enable();
-    //   } catch (error) {
-    //     console.error("User denied account access");
-    //   }
-    // }
-    // else if (window.web3) {
-    //   App.web3Provider = window.web3.currentProvider;
-    // }
-    // else {
+    if (window.ethereum) {
+      App.web3Provider = window.ethereum;
+      try {
+        await window.ethereum.enable();
+      } catch (error) {
+        console.error("User denied account access");
+      }
+    }
+    else if (window.web3) {
+      App.web3Provider = window.web3.currentProvider;
+    }
+    else {
       App.web3Provider = new Web3.providers.HttpProvider('http://localhost:7545');
       console.log("localhost7545");
-    // }
+    }
     web3 = new Web3(App.web3Provider);
 
     var account = App.getAccountParam();
@@ -64,22 +64,19 @@ App = {
   },
 
   initIPFS:function(){
-    ipfs = window.IpfsHttpClient.create({host:'ipfs.infura.io',port: 5001,
-    protocol:'https'});
+    // ipfs = window.IpfsHttpClient.create({host:'ipfs.infura.io',port: 5001,
+    // protocol:'https'});
+    ipfs = window.IpfsHttpClient.create({host:'localhost',port: 5001,
+    protocol:'http'});
+
     console.log(ipfs);
 
     return App.getCerts();
   },
 
   getCerts: function() {
-    $("#search").on('click', function(){
-      console.log("click search");
-      var check = $("#inputid").val();
-      if(check.match('/^[ ]*$/'))alert("your input exit empty");
-      else{
-        $('#certs').remove();
-        $('.row').append('<div id="certs" ></div>');
-        App.certIntance.getCertsLen($("#inputid").val()).then(function(len) {
+
+        App.certIntance.getCertsLen(App.account).then(function(len) {
           console.log("num of cert:" + len);
           App.arrayLength = len;
           if (len > 0) {
@@ -89,9 +86,6 @@ App = {
         }).catch(function(err) {
           console.log(err.message);
         });
-      }
-
-    });
 
   },
 
@@ -108,8 +102,8 @@ App = {
 
   loadCert: function(index) {
 
-    App.certIntance.certmap($("#inputid").val(), index).then(function(cert) {
-      cid = cert;
+    App.certIntance.certmap(App.account, index).then(function(cert) {
+      cid = cert[2];
       console.log(cid);
       toBuffer(ipfs.cat(cid)).then((bufferedContents)=>{
         certcontent = App.Uint8ArrayToString(bufferedContents);
@@ -126,6 +120,8 @@ App = {
         } else {
           App.adjustHeight();
         }
+      }).catch(function(err){
+        console.log(err.message);
       });
 
     } ).catch(function(err) {

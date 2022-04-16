@@ -45,6 +45,8 @@ App = {
   initAccount: function() {
     web3.eth.getAccounts(function(error, accounts) {
       App.account = accounts[0];
+
+      console.log(accounts);
     });
   },
 
@@ -55,40 +57,45 @@ App = {
 
       App.contracts.certContract.deployed().then(function(instance) {
         App.certIntance = instance;
-        return App.getInfo();
+        return App.bindEvents();
       });
 
     });
 
   },
 
-  getInfo: function() {
-    $("#allca").on('click', function(){
-      console.log("click allca");
-      $('#users').remove();
-      $('#cas').remove();
-      $('.row').append('<div id="cas" ></div>');
-        App.certIntance.getCAListLen().then(function(len) {
-          console.log("num of ca:" + len);
-          App.arrayLength = len;
-          if (len > 0) {
-            App.loadCA( len - 1);
-          }
-        }).catch(function(err) {
+  bindEvents: function() {
+
+    $("#new_uploader").on('click', function(){
+      console.log("click new");
+      var flag=true;
+      $('textarea').each(function(){
+        var check = this.value;
+        if(check.match('/^[ ]*$/')){
+          alert("your input exit empty");
+          flag=false;
+          return false;
+        }
+      });
+      if(flag){
+        console.log(App.account);
+        App.certIntance.addUploader($("#new_uploader1").val(),$("#new_uploader2").val(),{from:App.account}).then(function(result) {
+           return App.watchChange();
+        }).catch(function (err) {
           console.log(err.message);
         });
+      }
     });
 
-    $("#alluser").on('click', function(){
-      console.log("click alluser");
-      $('#cas').remove();
-      $('#users').remove();
-      $('.row').append('<div id="users" ></div>');
-        App.certIntance.getUserListLen().then(function(len) {
-          console.log("num of user:" + len);
+    $("#all_uploader").on('click', function(){
+      console.log("click all");
+      $('#uploaders').remove();
+      $('.row').append('<div id="uploaders" ></div>');
+        App.certIntance.getUploadListLen().then(function(len) {
+          console.log("num of uploader:" + len);
           App.arrayLength = len;
           if (len > 0) {
-            App.loadUser( len - 1);
+            App.loadUploader( len - 1);
           }
         }).catch(function(err) {
           console.log(err.message);
@@ -108,42 +115,19 @@ App = {
         })
   },
 
-  loadCA: function(index) {
-    App.certIntance.calist(index).then(function(address) {
-      App.certIntance.camap(address).then(function(caname){
-        $("#cas").append(
+  loadUploader: function(index) {
+    App.certIntance.uploadlist(index).then(function(address) {
+      App.certIntance.uploadermap(address).then(function(name){
+        $("#uploaders").append(
         '<div class="form-horizontal"> <div class="form-group"><div class="col-sm-8 col-sm-push-1 ">' +
-        ' <textarea class="form-control" id="ca'+
+        ' <textarea class="form-control" id="uploader'+
         + index
         + '" >'
-        + address+' : '+caname[0]
+        + address +name
         + '</textarea></div>'
         +  '</div> </div>');
         if (index -1 >= 0) {
-          App.loadCA(index - 1);
-        } else {
-          App.adjustHeight();
-        }
-      });
-
-    }).catch(function(err) {
-      console.log(err.message);
-    });
-  },
-
-  loadUser: function(index) {
-    App.certIntance.userlist(index).then(function(userid) {
-      App.certIntance.usermap(userid).then(function(username){
-        $("#users").append(
-        '<div class="form-horizontal"> <div class="form-group"><div class="col-sm-8 col-sm-push-1 ">' +
-        ' <textarea class="form-control" id="user'+
-        + index
-        + '" >'
-        + userid+' : '+username[0]
-        + '</textarea></div>'
-        +  '</div> </div>');
-        if (index -1 >= 0) {
-          App.loadUser(index - 1);
+          App.loadUploader(index - 1);
         } else {
           App.adjustHeight();
         }
@@ -152,6 +136,16 @@ App = {
       console.log(err.message);
     });
   },
+
+  watchChange: function() {
+      var infoEvent = App.certIntance.NewUploader();
+      return infoEvent.watch(function (err, result) {
+        console.log("reload");
+        window.location.reload();
+      });
+  },
+
+
 
   getAccountParam: function() {
     var reg = new RegExp("(^|&)account=([^&]*)(&|$)");
