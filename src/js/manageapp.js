@@ -4,7 +4,6 @@ App = {
   account: null,
   certIntance: null,
   ipfs:null,
-  arrayLength : 0,
   address: null,
 
   init: async function() {
@@ -86,8 +85,7 @@ App = {
       }else {
         App.address = $('#address').val();
         App.certIntance.getCertsLen(App.address).then(function(len) {
-          console.log("num of cert:" + len);
-          App.arrayLength = len;
+          // console.log("num of cert:" + len);
           if (len > 0) {
             App.loadCert( len - 1);
           }
@@ -131,11 +129,12 @@ App = {
   },
 
   loadCert: function(index) {
-
     App.certIntance.certmap(App.address, index).then(function(cert) {
       cid = cert[2];
-      console.log(cid);
-
+      console.log(App.account)
+      console.log(cert[0])
+      if(cert[0]==App.account){
+        console.log(cid);
         toBuffer(ipfs.cat(cid)).then((bufferedContents)=>{
           certcontent = App.Uint8ArrayToString(bufferedContents);
           certcontent = $.parseJSON(certcontent);
@@ -148,15 +147,16 @@ App = {
           + '</textarea></div>'
           + '<button class="btn btn-primary col-sm-1 col-sm-push-1" name="cancel'+index+'" value='+index+'>cancel</button>'
           +  '</div> </div>');
-          if (index -1 >= 0) {
-            App.loadCert(index - 1);
-          } else {
-            App.adjustHeight();
-          }
+
         }).catch(function(err){
           console.log(err.message);
         });
-
+      }
+      if (index -1 >= 0) {
+        App.loadCert(index - 1);
+      } else {
+        App.adjustHeight();
+      }
     } ).catch(function(err) {
       console.log(err.message);
     });
