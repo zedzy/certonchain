@@ -70,7 +70,7 @@ App = {
       var flag=true;
       $('textarea').each(function(){
         var check = this.value;
-        if(check.match('/^[ ]*$/')){
+        if(check.match(/^[ ]*$/)){
           alert("your input exit empty");
           flag=false;
           return false;
@@ -122,7 +122,7 @@ App = {
         ' <textarea class="form-control" id="uploader'+
         + index
         + '" >'
-        + address +name
+        + address + '\n'+ name
         + '</textarea></div>'
         +  '</div> </div>');
         if (index -1 >= 0) {

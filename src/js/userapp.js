@@ -109,14 +109,22 @@ App = {
         toBuffer(ipfs.cat(cid)).then((bufferedContents)=>{
           certcontent = App.Uint8ArrayToString(bufferedContents);
           certcontent = $.parseJSON(certcontent);
-          $("#certs").append(
-          '<div class="form-horizontal"> <div class="form-group"><div class="col-sm-8 col-sm-push-1 ">' +
-          ' <textarea class="form-control" id="cert'+
-          + index
-          + '" >'
-          + certcontent.cert + '\n' +certcontent.time
-          + '</textarea></div>'
-          +  '</div> </div>');
+          var certTemplate=$('#certTemplate')
+          certTemplate.find('.cert-cert').text(certcontent.cert)
+          certTemplate.find('.cert-time').text(certcontent.time)
+          certTemplate.find('.cert-category').text(certcontent.category)
+          certTemplate.find('.cert-issuer').text(certcontent.issuer)
+          certTemplate.find('.cert-uploader').text(cert[0])
+          console.log(certTemplate)
+          $('#certs').append(certTemplate.html())
+          // $("#certs").append(
+          // '<div class="form-horizontal"> <div class="form-group"><div class="col-sm-8 col-sm-push-1 ">' +
+          // ' <textarea class="form-control" id="cert'+
+          // + index
+          // + '" >'
+          // + certcontent.cert + '\n' +certcontent.time
+          // + '</textarea></div>'
+          // +  '</div> </div>');
 
         }).catch(function(err){
           console.log(err.message);
@@ -124,8 +132,6 @@ App = {
       }
       if (index -1 >= 0) {
         App.loadCert(index - 1);
-      } else {
-        App.adjustHeight();
       }
     } ).catch(function(err) {
       console.log(err.message);

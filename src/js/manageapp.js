@@ -79,7 +79,7 @@ App = {
       $('#certs').remove();
       $('.row').append('<div id="certs" ></div>');
       var check = $('#address').val();
-      if(check.match('/^[ ]*$/')){
+      if(check.match(/^[ ]*$/)){
         alert("your input exit empty");
         return false;
       }else {
@@ -108,14 +108,7 @@ App = {
   },
 
   adjustHeight: function() {
-    console.log("reset height");
-    $('textarea').each(function () {
-      console.log("reset height");
-           this.setAttribute('style', 'height:' + (this.scrollHeight) + 'px;overflow-y:hidden;');
-        }).on('input', function () {
-        this.style.height = 'auto';
-        this.style.height = (this.scrollHeight) + 'px';
-      });
+    // console.log("reset height");
 
       $("[name^=cancel]").on('click', function(){
         console.log(this.value);
@@ -131,22 +124,34 @@ App = {
   loadCert: function(index) {
     App.certIntance.certmap(App.address, index).then(function(cert) {
       cid = cert[2];
-      console.log(App.account)
-      console.log(cert[0])
+      // console.log(App.account)
+      //console.log(cert[1])
       if(cert[0]==App.account){
-        console.log(cid);
+        //console.log(cid);
         toBuffer(ipfs.cat(cid)).then((bufferedContents)=>{
           certcontent = App.Uint8ArrayToString(bufferedContents);
           certcontent = $.parseJSON(certcontent);
-          $("#certs").append(
-          '<div class="form-horizontal"> <div class="form-group"><div class="col-sm-8 col-sm-push-1 ">' +
-          ' <textarea class="form-control" id="cert'+
-          + index
-          + '" >'
-          + certcontent.cert + '\n' +certcontent.time + '\n' +cert[1]
-          + '</textarea></div>'
-          + '<button class="btn btn-primary col-sm-1 col-sm-push-1" name="cancel'+index+'" value='+index+'>cancel</button>'
-          +  '</div> </div>');
+          var certTemplate=$('#certTemplate')
+          certTemplate.find('.cert-cert').text(certcontent.cert)
+          certTemplate.find('.cert-time').text(certcontent.time)
+          certTemplate.find('.cert-category').text(certcontent.category)
+          certTemplate.find('.cert-issuer').text(certcontent.issuer)
+          certTemplate.find('.cert-uploader').text(cert[0])
+          certTemplate.find('.cert-effective').text(cert[1])
+          certTemplate.find('.btn-cancel').attr('name','cancel'+index)
+          certTemplate.find('.btn-cancel').attr('value',index)
+          // console.log(certTemplate)
+          $('#certs').append(certTemplate.html())
+          // $("#certs").append(
+          // '<div class="form-horizontal"> <div class="form-group"><div class="col-sm-8 col-sm-push-1 ">' +
+          // ' <textarea class="form-control" id="cert'+
+          // + index
+          // + '" >'
+          // + certcontent.cert + '\n' +certcontent.time + '\n' +cert[1]
+          // + '</textarea></div>'
+          // + '<button class="btn btn-primary col-sm-1 col-sm-push-1" name="cancel'+index+'" value='+index+'>cancel</button>'
+          // +  '</div> </div>');
+          App.adjustHeight();
 
         }).catch(function(err){
           console.log(err.message);
@@ -154,8 +159,6 @@ App = {
       }
       if (index -1 >= 0) {
         App.loadCert(index - 1);
-      } else {
-        App.adjustHeight();
       }
     } ).catch(function(err) {
       console.log(err.message);

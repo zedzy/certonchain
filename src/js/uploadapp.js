@@ -87,7 +87,7 @@ App = {
       var flag=true;
       $('textarea').each(function(){
         var check = this.value;
-        if(check.match('/^[ ]*$/')){
+        if(check.match(/^[ ]*$/)){
           alert("your input exit empty");
           flag=false;
           return false;
@@ -100,6 +100,8 @@ App = {
             $.getJSON('./json/Cert.json',function(jsonObject){
               jsonObject.cert = $("#new_cert2").val();
               jsonObject.time = $("#new_cert3").val();
+              jsonObject.category = $("#new_cert4").val();
+              jsonObject.issuer = ca;
               certInfo = JSON.stringify(jsonObject);
               ipfs.add(certInfo).then((response)=>{
                 cid = response.cid.toString(); //获取cid，即⽂件标识
