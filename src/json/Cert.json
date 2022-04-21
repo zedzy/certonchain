@@ -1,4 +1,6 @@
 {
   "cert":null,
-  "time":null
+  "issuer":null,
+  "time":null,
+  "class":null
 }
