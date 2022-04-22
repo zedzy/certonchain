@@ -81,23 +81,14 @@ App = {
           App.arrayLength = len;
           if (len > 0) {
             App.loadCert( len - 1);
+          }else{
+            alert("number 0f certs:0");
           }
 
         }).catch(function(err) {
           console.log(err.message);
         });
 
-  },
-
-  adjustHeight: function() {
-    console.log("reset height");
-    $('textarea').each(function () {
-      console.log("reset height");
-           this.setAttribute('style', 'height:' + (this.scrollHeight) + 'px;overflow-y:hidden;');
-        }).on('input', function () {
-        this.style.height = 'auto';
-        this.style.height = (this.scrollHeight) + 'px';
-        })
   },
 
   loadCert: function(index) {

@@ -81,6 +81,7 @@ App = {
         App.certIntance.addUploader($("#new_uploader1").val(),$("#new_uploader2").val(),{from:App.account}).then(function(result) {
            return App.watchChange();
         }).catch(function (err) {
+          alert(err.message);
           console.log(err.message);
         });
       }
@@ -95,8 +96,11 @@ App = {
           App.arrayLength = len;
           if (len > 0) {
             App.loadUploader( len - 1);
+          }else{
+            alert("number of uploaders:0");
           }
         }).catch(function(err) {
+          alert(err.message);
           console.log(err.message);
         });
     });
@@ -132,6 +136,7 @@ App = {
         }
       });
     }).catch(function(err) {
+      alert(err.message);
       console.log(err.message);
     });
   },

@@ -88,9 +88,12 @@ App = {
           // console.log("num of cert:" + len);
           if (len > 0) {
             App.loadCert( len - 1);
+          }else{
+            alert("number of certs:0");
           }
 
         }).catch(function(err) {
+          alert(err.message);
           console.log(err.message);
         });
       }
@@ -115,6 +118,7 @@ App = {
         App.certIntance.cancel(App.address,this.value,{from:App.account}).then(function(result){
           return App.watchChange();
         }).catch(function (err) {
+          alert(err.message);
           console.log(err.message);
         });
       });
@@ -154,6 +158,7 @@ App = {
           App.adjustHeight();
 
         }).catch(function(err){
+          alert(err.message);
           console.log(err.message);
         });
       }
@@ -161,6 +166,7 @@ App = {
         App.loadCert(index - 1);
       }
     } ).catch(function(err) {
+      alert(err.message);
       console.log(err.message);
     });
 

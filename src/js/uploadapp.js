@@ -109,6 +109,7 @@ App = {
                 App.certIntance.addCert($("#new_cert1").val(),cid,{from:App.account}).then(function(result) {
                    return App.watchChange();
                 }).catch(function (err) {
+                  alert(err.message);
                   console.log(err.message);
                 });
               });
